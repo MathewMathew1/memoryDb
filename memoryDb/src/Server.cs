@@ -10,6 +10,7 @@ using RedisServer.Connection.Service;
 using RedisServer.Database.Service;
 using RedisServer.Event.Service;
 using RedisServer.Listener;
+using RedisServer.Publish.Service;
 using RedisServer.RdbFile.Service;
 using RedisServer.Replication.Service;
 using RedisServer.ServerInfo.Service;
@@ -55,7 +56,7 @@ namespace RedisServer.App
 
                     // Core services
                     services.AddSingleton<ConnectionManager>();
-
+                    services.AddSingleton<IPublishService, PublishService>();
                     services.AddSingleton<IReplicationMetrics, ReplicationMetrics>();
                     services.AddSingleton<EventLoop>();
                     services.AddSingleton<ICommandParser, CommandParser>();

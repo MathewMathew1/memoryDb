@@ -31,6 +31,9 @@ namespace RedisServer.CommandHandlers.Service
             services.AddSingleton<ICommandHandler, GetLenCommand>();
             services.AddSingleton<ICommandHandler, RemoveValuesCommand>();
             services.AddSingleton<ICommandHandler, AuthCommand>();
+            services.AddSingleton<ICommandHandler, SubscribeCommand>();
+            services.AddSingleton<ICommandHandler, UnSubscribeCommand>();
+            services.AddSingleton<ICommandHandler, PublishCommand>();
 
             services.AddSingleton<ICommandMetaHandler, ExecCommand>();
             services.AddSingleton<ICommandMetaHandler, DiscardCommand>();
