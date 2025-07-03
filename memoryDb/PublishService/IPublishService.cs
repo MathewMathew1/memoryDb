@@ -8,5 +8,7 @@ namespace RedisServer.Publish.Service
         void Unsubscribe(string channel, Socket client);
         int Publish(string channel, string message);
         int SubscriptionCount(Socket socket);
+        void AddPatternSubscription(string globPattern, Socket socket);
+        void RemovePatternSubscription(string globPattern, Socket socket);
     }
 }

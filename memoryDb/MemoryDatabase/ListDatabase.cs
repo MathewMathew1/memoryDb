@@ -1,12 +1,10 @@
 using System.Collections.Concurrent;
-using RedisServer.StreamServices.Service;
 
 namespace RedisServer.Database.Service
 {
     public class ListDatabase : IListDatabase
     {
         private readonly ConcurrentDictionary<string, ConcurrentLinkedList> _lists = new();
-        private readonly StreamWaitManager _waitManager = new();
 
         public ConcurrentDictionary<string, ConcurrentLinkedList> GetSnapshot()
         {

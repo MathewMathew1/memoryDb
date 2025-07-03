@@ -104,7 +104,78 @@ namespace RedisServer.CommandHandlers.Service
 
 
 
+
+
     }
 
+    public class PUnSubscribeCommand : ICommandHandler
+    {
+        private readonly IPublishService _publishService;
+
+
+        public PUnSubscribeCommand(IPublishService publishService)
+        {
+            _publishService = publishService;
+        }
+
+        public string CommandName => "PUNSUBSCRIBE";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count < 1)
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'punsubscribe'\r\n") };
+
+            var pattern = command.Arguments[0];
+
+            _publishService.RemovePatternSubscription(pattern, socket);
+
+            var amountOfSubscriptions = _publishService.SubscriptionCount(socket);
+
+            return new[]
+            {
+                Encoding.UTF8.GetBytes(
+                    $"*3\r\n" +
+                    $"${"punsubscribe".Length}\r\npunsubscribe\r\n" +
+                    $"${pattern.Length}\r\n{pattern}\r\n" +
+                    $"${amountOfSubscriptions.ToString().Length}\r\n{amountOfSubscriptions}\r\n"
+                )
+            };
+        }
+
+    }
+
+    public class PSubscribeCommand : ICommandHandler
+    {
+        private readonly IPublishService _publishService;
+
+
+        public PSubscribeCommand(IPublishService publishService)
+        {
+            _publishService = publishService;
+        }
+
+        public string CommandName => "PSUBSCRIBE";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count < 1)
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'psubscribe'\r\n") };
+            var pattern = command.Arguments[0];
+
+            _publishService.AddPatternSubscription(pattern, socket);
+
+            var amountOfSubscriptions = _publishService.SubscriptionCount(socket);
+
+            return new[]
+            {
+                Encoding.UTF8.GetBytes(
+                    $"*3\r\n" +
+                    $"${"psubscribe".Length}\r\npsubscribe\r\n" +
+                    $"${pattern.Length}\r\n{pattern}\r\n" +
+                    $"${amountOfSubscriptions.ToString().Length}\r\n{amountOfSubscriptions}\r\n"
+                )
+            };
+        }
+    }
 
 }

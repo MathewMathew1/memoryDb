@@ -34,6 +34,8 @@ namespace RedisServer.CommandHandlers.Service
             services.AddSingleton<ICommandHandler, SubscribeCommand>();
             services.AddSingleton<ICommandHandler, UnSubscribeCommand>();
             services.AddSingleton<ICommandHandler, PublishCommand>();
+            services.AddSingleton<ICommandHandler, PUnSubscribeCommand>();
+            services.AddSingleton<ICommandHandler, PSubscribeCommand>();
 
             services.AddSingleton<ICommandMetaHandler, ExecCommand>();
             services.AddSingleton<ICommandMetaHandler, DiscardCommand>();
