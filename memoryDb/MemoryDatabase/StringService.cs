@@ -75,6 +75,26 @@ namespace RedisServer.Database.Service
                 }
             }
         }
+
+        public int? IncreaseBy(string key, int increaseBy)
+        {
+            if (!_strings.TryGetValue(key, out var val))
+            {
+                return 0;
+            }
+
+            var newVal = val;
+            if (!int.TryParse(val.value, out int current))
+                return null;
+
+            var newValue = current * increaseBy;
+
+            newVal.value = newValue.ToString();
+
+            _strings.TryUpdate(key, newVal, val);
+
+            return newValue;
+        }
     }
 
 }

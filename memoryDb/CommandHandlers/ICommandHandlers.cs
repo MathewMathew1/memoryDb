@@ -9,6 +9,12 @@ namespace RedisServer.CommandHandlers.Service
         Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket);
     }
 
+     public interface ILuaCommandHandler
+    {
+        string CommandName { get; }
+        Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket);
+    }
+
     public interface IMasterCommandHandler
     {
         string CommandName { get; }

@@ -6,24 +6,27 @@ using RedisServer.CommandHandlers.Service;
 
 namespace RedisServer.Command.Service
 {
-    public class CommandDispatcher : ICommandDispatcher
+    public class LuaCommandDispatcher : ICommandDispatcher
     {
-        private readonly Dictionary<string, ICommandHandler> _handlers;
+        private readonly Dictionary<string, ILuaCommandHandler> _handlers;
 
-        public CommandDispatcher(IEnumerable<ICommandHandler> handlers, IEnumerable<IMasterCommandHandler> masterHandlers)
+        public LuaCommandDispatcher(IEnumerable<ILuaCommandHandler> handlers)
         {
             _handlers = handlers.ToDictionary(h =>
             {
                 return h.CommandName.ToLowerInvariant();
             });
+
         }
 
         public async Task<IEnumerable<byte[]>?> DispatchCommand(ParsedCommand command, Socket socket)
         {
+
             if (_handlers.TryGetValue(command.Name.ToLowerInvariant(), out var handler))
                 return await handler.Handle(command, socket);
 
-            return null; ;
+
+            return null;
         }
 
     }

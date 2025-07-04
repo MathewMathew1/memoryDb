@@ -22,6 +22,7 @@ namespace RedisServer.Publish.Service
         public PublishService(ILogger<PublishService> logger, ConnectionManager connectionManager)
         {
             _logger = logger;
+            _connectionManager = connectionManager;
         }
 
         public void AddSubscription(string channel, Socket socket)

@@ -8,10 +8,10 @@ namespace RedisServer.Transaction.Service
 {
     public class TransactionExecutor : ITransactionExecutor
     {
-        private readonly ICommandDispatcher _dispatcher;
+        private readonly CommandDispatcher _dispatcher;
         private readonly ConnectionManager _connectionManager;
 
-        public TransactionExecutor(ICommandDispatcher dispatcher, ConnectionManager connectionManager)
+        public TransactionExecutor(CommandDispatcher dispatcher, ConnectionManager connectionManager)
         {
             _dispatcher = dispatcher;
             _connectionManager = connectionManager;
@@ -31,7 +31,7 @@ namespace RedisServer.Transaction.Service
                 
                 var command = connection.CommandsInQueue.Dequeue();
  
-                var response = await _dispatcher.DispatchCommand(command, socket, false);
+                var response = await _dispatcher.DispatchCommand(command, socket);
                 result.Add(response);
             }
 

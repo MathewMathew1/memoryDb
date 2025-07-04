@@ -36,14 +36,20 @@ namespace RedisServer.CommandHandlers.Service
             services.AddSingleton<ICommandHandler, PublishCommand>();
             services.AddSingleton<ICommandHandler, PUnSubscribeCommand>();
             services.AddSingleton<ICommandHandler, PSubscribeCommand>();
+            services.AddSingleton<ICommandHandler, IncrbyCommand>();
+
+            services.AddSingleton<ILuaCommandHandler, EvalCommand>();
 
             services.AddSingleton<ICommandMetaHandler, ExecCommand>();
             services.AddSingleton<ICommandMetaHandler, DiscardCommand>();
 
             services.AddSingleton<IMasterCommandHandler, AckCommand>();
 
+            services.AddSingleton<LuaCommandDispatcher>();
+            services.AddSingleton<MasterCommandDispatcher>();
             services.AddSingleton<IMetaCommandDispatcher, MetaCommandDispatcher>();
-            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+            services.AddSingleton<CommandDispatcher>();
+            
 
             return services;
         }

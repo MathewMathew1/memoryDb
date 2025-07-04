@@ -5,7 +5,7 @@ namespace RedisServer.Command.Service
 {
     public interface ICommandDispatcher
     {
-        public Task<IEnumerable<byte[]>> DispatchCommand(ParsedCommand command, Socket socket, bool isMasterCommand);
+        public Task<IEnumerable<byte[]>?> DispatchCommand(ParsedCommand command, Socket socket);
     }
     
 }

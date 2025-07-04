@@ -16,24 +16,29 @@ namespace RedisServer.Listener
         private readonly TcpListener _tcpServer;
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger<RedisServerListener> _logger;
-        private readonly ICommandDispatcher _commandDispatcher;
+
         private readonly ICommandParser _commandParser;
         private readonly IReplicaSocketService _replicaSocketService;
         private readonly IServerInfoService _serverInfoService;
         private readonly IMetaCommandDispatcher _metaCommandDispatcher;
         private static readonly HashSet<string> SafeCommands = new() { "AUTH", "PING" };
+        private readonly List<ICommandDispatcher> _commandDispatchers = new List<ICommandDispatcher>();
 
-        public RedisServerListener(TcpListener tcpServer, ConnectionManager connectionManager, ILogger<RedisServerListener> logger, ICommandDispatcher commandDispatcher,
-        ICommandParser commandParser, IReplicaSocketService replicaSocketService, IServerInfoService serverInfoService, IMetaCommandDispatcher metaCommandDispatcher)
+        public RedisServerListener(TcpListener tcpServer, ConnectionManager connectionManager, ILogger<RedisServerListener> logger, CommandDispatcher commandDispatcher,
+        ICommandParser commandParser, IReplicaSocketService replicaSocketService, IServerInfoService serverInfoService, IMetaCommandDispatcher metaCommandDispatcher,
+        LuaCommandDispatcher luaCommandDispatcher)
         {
             _tcpServer = tcpServer;
             _connectionManager = connectionManager;
             _logger = logger;
-            _commandDispatcher = commandDispatcher;
             _commandParser = commandParser;
             _replicaSocketService = replicaSocketService;
             _serverInfoService = serverInfoService;
             _metaCommandDispatcher = metaCommandDispatcher;
+
+            _commandDispatchers.Add(metaCommandDispatcher);
+            _commandDispatchers.Add(commandDispatcher);
+            _commandDispatchers.Add(luaCommandDispatcher);
 
             _tcpServer.Start();
         }
@@ -120,8 +125,13 @@ namespace RedisServer.Listener
 
             try
             {
-                var values = await _metaCommandDispatcher.DispatchCommand(command, socket)
-           ?? await _commandDispatcher.DispatchCommand(command, socket, false);
+                IEnumerable<byte[]>? values = null;
+                foreach (var dispatcher in _commandDispatchers)
+                {
+                    values = await dispatcher.DispatchCommand(command, socket);
+
+                    if (values != null) break;
+                }
 
                 if (values != null)
                 {

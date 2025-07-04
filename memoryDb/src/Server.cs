@@ -10,6 +10,7 @@ using RedisServer.Connection.Service;
 using RedisServer.Database.Service;
 using RedisServer.Event.Service;
 using RedisServer.Listener;
+using RedisServer.LuaManager.Service;
 using RedisServer.Publish.Service;
 using RedisServer.RdbFile.Service;
 using RedisServer.Replication.Service;
@@ -55,6 +56,7 @@ namespace RedisServer.App
                     });
 
                     // Core services
+                    services.AddSingleton<ILuaService, LuaService>();
                     services.AddSingleton<ConnectionManager>();
                     services.AddSingleton<IPublishService, PublishService>();
                     services.AddSingleton<IReplicationMetrics, ReplicationMetrics>();
@@ -77,6 +79,7 @@ namespace RedisServer.App
                     services.AddSingleton<RedisServerListener>();
                     services.AddHostedService<RedisStartupService>();
                     services.AddSingleton<IReplicationHandshakeClient, ReplicationHandshakeClient>();
+                    
 
                     // Hosted services
                     services.AddHostedService<ReplicationStartupService>();

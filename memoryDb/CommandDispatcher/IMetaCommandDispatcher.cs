@@ -3,9 +3,8 @@ using RedisServer.Command.Model;
 
 namespace RedisServer.Command.Service
 {
-    public interface IMetaCommandDispatcher
+    public interface IMetaCommandDispatcher : ICommandDispatcher
     {
-        Task<IEnumerable<byte[]>?> DispatchCommand(ParsedCommand command, Socket socket);
         bool CommandIsInThePool(ParsedCommand command);
     }
     

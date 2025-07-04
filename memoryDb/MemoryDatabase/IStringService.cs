@@ -14,7 +14,7 @@ namespace RedisServer.Database.Service
         void Delete(string key);
         object SyncRoot { get; }
         Dictionary<string, ValueInMemory> GetAllSnapshot();
-
+        int? IncreaseBy(string key, int increaseBy);
     }
 
 }

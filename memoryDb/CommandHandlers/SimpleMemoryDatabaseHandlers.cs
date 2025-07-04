@@ -136,6 +136,36 @@ namespace RedisServer.CommandHandlers.Service
             return new[] { Encoding.UTF8.GetBytes($":{value}\r\n") };
         }
     }
+
+      public class IncrbyCommand : ICommandHandler
+    {
+        private readonly IStringService _db;
+
+        public IncrbyCommand(IStringService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => "incrby";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+
+            if (command.Arguments.Count < 2)
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'Incr'\r\n") };
+            
+            var key = command.Arguments[0];
+            var increaseBy = int.Parse(command.Arguments[1]);
+       
+            var value = _db.IncreaseBy(key, increaseBy);
+            if (value == null)
+            {
+                return new[] { Encoding.UTF8.GetBytes($"-ERR value is not an integer or out of range\r\n") };
+            }
+
+            return new[] { Encoding.UTF8.GetBytes($":{value}\r\n") };
+        }
+    }
 }
 
 

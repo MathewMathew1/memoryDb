@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using RedisServer.Command.Service;
 using RedisServer.CommandHandlers.Model;
+using RedisServer.CommandHandlers.Service;
 using RedisServer.RdbFile.Service;
 using RedisServer.ServerInfo.Service;
 
@@ -14,12 +15,13 @@ namespace RedisServer.Replication.Service
         private readonly ILogger<ReplicationHandshakeClient> _logger;
         private readonly ICommandParser _commandParser;
         private readonly ICommandDispatcher _commandDispatcher;
+        private readonly ICommandDispatcher _masterCommandHandler;
         private readonly IReplicationMetrics _metrics;
         private readonly IServerInfoService _serverInfoService;
         private readonly IRdbFileService _rdbFileService;
 
-        public ReplicationHandshakeClient(ILogger<ReplicationHandshakeClient> logger, ICommandParser commandParser, ICommandDispatcher commandDispatcher,
-        IReplicationMetrics metrics, IServerInfoService serverInfoService, IRdbFileService rdbFileService)
+        public ReplicationHandshakeClient(ILogger<ReplicationHandshakeClient> logger, ICommandParser commandParser, CommandDispatcher commandDispatcher,
+        IReplicationMetrics metrics, IServerInfoService serverInfoService, IRdbFileService rdbFileService, MasterCommandDispatcher masterCommandDispatcher)
         {
             _logger = logger;
             _commandParser = commandParser;
@@ -27,6 +29,7 @@ namespace RedisServer.Replication.Service
             _metrics = metrics;
             _serverInfoService = serverInfoService;
             _rdbFileService = rdbFileService;
+            _masterCommandHandler = masterCommandDispatcher;
         }
 
         public async Task PerformHandshakeAsync(string host, int port, int localPort)
@@ -93,7 +96,7 @@ namespace RedisServer.Replication.Service
 
                     if (command.Name.ToLower().StartsWith("replconf"))
                     {
-                        var responses = await _commandDispatcher.DispatchCommand(command, socket, true);
+                        var responses = await _masterCommandHandler.DispatchCommand(command, socket);
                         foreach (var response in responses)
                         {
                             await socket.SendAsync(response, SocketFlags.None);
@@ -102,7 +105,7 @@ namespace RedisServer.Replication.Service
                     }
                     else
                     {
-                        await _commandDispatcher.DispatchCommand(command, socket, false);
+                        await _commandDispatcher.DispatchCommand(command, socket);
                     }
 
                     _metrics.BytesReadFromMaster += command.BytesConsumed;
