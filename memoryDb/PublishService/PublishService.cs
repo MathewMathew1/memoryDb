@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using RedisServer.Connection.Service;
 
 namespace RedisServer.Publish.Service
 {
@@ -11,11 +12,14 @@ namespace RedisServer.Publish.Service
         private ConcurrentDictionary<string, HashSet<Socket>> _subscriptions = new ConcurrentDictionary<string, HashSet<Socket>>();
         private ConcurrentDictionary<Regex, HashSet<Socket>> _patternSubscriptions = new();
 
+        private readonly ConcurrentDictionary<(Socket, string), Action<Socket>> _disconnectCallbacks = new ConcurrentDictionary<(Socket, string), Action<Socket>>();
+
         private readonly object _lock = new();
 
         private readonly ILogger<PublishService> _logger;
+        private readonly ConnectionManager _connectionManager;
 
-        public PublishService(ILogger<PublishService> logger)
+        public PublishService(ILogger<PublishService> logger, ConnectionManager connectionManager)
         {
             _logger = logger;
         }
@@ -31,6 +35,14 @@ namespace RedisServer.Publish.Service
 
                 _subscriptions[channel].Add(socket);
             }
+
+            var callback = new Action<Socket>(s =>
+            {
+                Unsubscribe(channel, s);
+            });
+
+            _disconnectCallbacks[(socket, channel)] = callback;
+            _connectionManager.AddOnDisconnectEvent(socket, callback);
         }
 
         public void Unsubscribe(string channel, Socket client)
@@ -44,6 +56,11 @@ namespace RedisServer.Publish.Service
                         _subscriptions.Remove(channel, out _);
                 }
             }
+
+            if (_disconnectCallbacks.TryRemove((client, channel), out var callback))
+            {
+                _connectionManager.RemoveOnDisconnectEvent(client, callback);
+            }
         }
 
         public int Publish(string channel, string message)
@@ -54,6 +71,7 @@ namespace RedisServer.Publish.Service
                 if (_subscriptions.TryGetValue(channel, out var clients))
                     targets = new HashSet<Socket>(clients);
             }
+
 
             foreach (var kvp in _patternSubscriptions)
             {
@@ -132,6 +150,14 @@ namespace RedisServer.Publish.Service
                         return existingSet;
                     });
             }
+
+            var callback = new Action<Socket>(s =>
+           {
+               RemovePatternSubscription(globPattern, socket);
+           });
+
+            _disconnectCallbacks[(socket, globPattern)] = callback;
+            _connectionManager.AddOnDisconnectEvent(socket, callback);
         }
 
         public void RemovePatternSubscription(string globPattern, Socket socket)
@@ -151,6 +177,11 @@ namespace RedisServer.Publish.Service
                         _patternSubscriptions.Remove(regex, out _);
                 }
 
+            }
+
+            if (_disconnectCallbacks.TryRemove((socket, globPattern), out var callback))
+            {
+                _connectionManager.RemoveOnDisconnectEvent(socket, callback);
             }
         }
 

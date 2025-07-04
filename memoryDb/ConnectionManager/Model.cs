@@ -13,6 +13,7 @@ namespace RedisServer.Connection.Model
         public bool isAuth { get; set; } = false;
         public bool IsReplica { get; set; } = false;
         public bool ShouldSendRdb { get; set; } = false;
-        public Queue<ParsedCommand> CommandsInQueue { get; set; }  = new Queue<ParsedCommand>();
+        public Queue<ParsedCommand> CommandsInQueue { get; set; } = new Queue<ParsedCommand>();
+        public List<Action<Socket>> OnDisconnectEvents{ get; set; } = new List<Action<Socket>>();
     }
 }

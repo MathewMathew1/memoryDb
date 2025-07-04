@@ -21,57 +21,83 @@ namespace RedisServer.Connection.Service
 
         public void ChangeAuthSocket(Socket socket, bool isAuth)
         {
-            if (_connections.TryGetValue(socket, out var oldState))
+            if (_connections.TryGetValue(socket, out var state))
             {
-                var newState = new ConnectionState
-                {
-                    socket = oldState.socket,
-                    isAuth = isAuth
-                };
-
-                _connections.TryUpdate(socket, newState, oldState);
+                state.isAuth = isAuth;
             }
         }
 
         public void ChangeLockSocket(Socket socket, bool lockStatus)
         {
-            if (_connections.TryGetValue(socket, out var oldState))
+            if (_connections.TryGetValue(socket, out var state))
             {
-                var newState = new ConnectionState
-                {
-                    socket = oldState.socket,
-                    isLocked = lockStatus
-                };
-
-                _connections.TryUpdate(socket, newState, oldState);
+                state.isLocked = lockStatus;
             }
+
         }
 
         public void AbortTransaction(Socket socket)
         {
-            if (_connections.TryGetValue(socket, out var oldState))
+            if (_connections.TryGetValue(socket, out var state))
             {
-                var newState = new ConnectionState
-                {
-                    socket = oldState.socket,
-                    isLocked = false,
-                    CommandsInQueue = new Queue<ParsedCommand>()
-                };
-
-                _connections.TryUpdate(socket, newState, oldState);
+                state.isLocked = false;
+                state.CommandsInQueue = new Queue<ParsedCommand>();
             }
+
         }
 
         public void AddCommandToQueue(Socket socket, ParsedCommand command)
         {
             if (_connections.TryGetValue(socket, out var state))
             {
-                state.CommandsInQueue.Enqueue(command);
+                lock (state.CommandsInQueue)
+                {
+                    state.CommandsInQueue.Enqueue(command);
+                }
             }
         }
 
         public void RemoveSocket(Socket socket)
         {
+            _connections.TryRemove(socket, out _);
+        }
+
+        public void AddOnDisconnectEvent(Socket socket, Action<Socket> actionEvent)
+        {
+            if (!_connections.TryGetValue(socket, out var state)) return;
+
+            lock (state.OnDisconnectEvents)
+            {
+                state.OnDisconnectEvents.Add(actionEvent);
+            }
+        }
+
+        public void RemoveOnDisconnectEvent(Socket socket, Action<Socket> actionEvent)
+        {
+            if (!_connections.TryGetValue(socket, out var state)) return;
+
+            lock (state.OnDisconnectEvents)
+            {
+                state.OnDisconnectEvents.Remove(actionEvent);
+            }
+        }
+
+
+        public void Disconnect(Socket socket)
+        {
+            if (!_connections.TryGetValue(socket, out var state)) return;
+
+            List<Action<Socket>> actions;
+            lock (state.OnDisconnectEvents)
+            {
+                actions = new List<Action<Socket>>(state.OnDisconnectEvents);
+            }
+
+            foreach (var action in actions)
+            {
+                action(socket);
+            }
+
             _connections.TryRemove(socket, out _);
         }
     }

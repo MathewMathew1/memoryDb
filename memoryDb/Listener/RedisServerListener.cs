@@ -102,7 +102,7 @@ namespace RedisServer.Listener
             }
             finally
             {
-                _connectionManager.RemoveSocket(socket);
+                _connectionManager.Disconnect(socket);
                 socket.Close();
 
             }

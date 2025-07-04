@@ -82,9 +82,6 @@ namespace RedisServer.App
                     services.AddHostedService<ReplicationStartupService>();
                     services.AddHostedService<BackgroundKeyCleaner>();
 
-
-
-
                 })
                 .Build()
                 .Run();
