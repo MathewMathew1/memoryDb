@@ -57,6 +57,7 @@ namespace RedisServer.App
 
                     // Core services
                     services.AddSingleton<ILuaService, LuaService>();
+                    services.AddSingleton<ILuaScriptStorage, LuaScriptStorage>();
                     services.AddSingleton<ConnectionManager>();
                     services.AddSingleton<IPublishService, PublishService>();
                     services.AddSingleton<IReplicationMetrics, ReplicationMetrics>();

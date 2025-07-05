@@ -1,7 +1,6 @@
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NLua;
 using RedisServer.Command.Model;

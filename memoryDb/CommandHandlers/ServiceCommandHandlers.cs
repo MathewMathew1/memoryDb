@@ -39,6 +39,9 @@ namespace RedisServer.CommandHandlers.Service
             services.AddSingleton<ICommandHandler, IncrbyCommand>();
 
             services.AddSingleton<ILuaCommandHandler, EvalCommand>();
+            services.AddSingleton<ILuaCommandHandler, EvalShaCommand>();
+            services.AddSingleton<ILuaCommandHandler, ScriptCommand>();
+            services.AddSingleton<ILuaCommandHandler, FlushAllCommand>();
 
             services.AddSingleton<ICommandMetaHandler, ExecCommand>();
             services.AddSingleton<ICommandMetaHandler, DiscardCommand>();

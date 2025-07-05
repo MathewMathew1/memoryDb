@@ -150,6 +150,36 @@ def subscribe_and_listen(port, channel, results):
 
         print("UNSUBSCRIBING...", send_command(sock, f"UNSUBSCRIBE {channel}"))
 
+def runTestForScripts(master_sock, ):
+    script = """
+    return (function()
+    redis.call('set', KEYS[1], ARGV[1])
+    redis.call('incrby', KEYS[1], ARGV[2])
+    redis.call('incrby', KEYS[1], ARGV[3])
+    redis.call('incrby', KEYS[1], ARGV[4])
+    return redis.call('get', KEYS[1])
+    end)()
+    """
+
+    resp = send_command(master_sock, f"SCRIPT LOAD \"{script}\"")
+    script_sha = resp.strip()  
+    print("SCRIPT LOAD", script_sha)
+    exists_resp = send_command(master_sock, f"SCRIPT EXISTS {script_sha}")
+    print("SCRIPT EXISTS", exists_resp)
+
+    key = "lua-test-key"
+
+
+    evalsha_cmd = f"EVALSHA {script_sha} 1 {key} 5 10 15 20"
+    result = send_command(master_sock, evalsha_cmd)
+    print("EVALSHA result", result) 
+
+    print("GET key after EVALSHA", send_command(master_sock, f"GET {key}"))  
+
+    print("FLUSHALL", send_command(master_sock, "FLUSHALL"))
+
+    result_post_flush = send_command(master_sock, evalsha_cmd)
+    print("EVALSHA after FLUSHALL", result_post_flush)  # 
 
 def run():
     procs = []
@@ -204,7 +234,7 @@ def run():
                     'EVAL "redis.call(\'set\', KEYS[1], ARGV[1]); redis.call(\'incrby\', KEYS[1], ARGV[2]); redis.call(\'incrby\', KEYS[1], ARGV[3]); redis.call(\'incrby\', KEYS[1], ARGV[4]); return redis.call(\'get\', KEYS[1])" 1 counter 5 10 15 20',
                 ),
             )
-
+            runTestForScripts(master_sock)
             print("GET counter_key →", send_command(master_sock, "GET counter"))
             print("GET early_key →", send_command(master_sock, "GET early_key"))
             print("GET key that shouldnt exist →", send_command(master_sock, "GET key"))
