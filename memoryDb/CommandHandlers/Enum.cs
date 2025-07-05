@@ -8,6 +8,8 @@ namespace RedisServer.CommandHandlers.Model
         RPUSH,
         LPOP,
         RPOP,
-        LREM
+        LREM,
+        INCRBY,
+        INCR
     }
 }

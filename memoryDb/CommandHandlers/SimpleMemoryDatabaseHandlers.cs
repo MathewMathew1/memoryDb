@@ -119,7 +119,7 @@ namespace RedisServer.CommandHandlers.Service
             _db = db;
         }
 
-        public string CommandName => "INCR";
+        public string CommandName => CommandType.INCR.ToString().ToLowerInvariant();
 
         public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
         {
@@ -146,7 +146,7 @@ namespace RedisServer.CommandHandlers.Service
             _db = db;
         }
 
-        public string CommandName => "incrby";
+        public string CommandName => CommandType.INCRBY.ToString().ToLowerInvariant();
 
         public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
         {

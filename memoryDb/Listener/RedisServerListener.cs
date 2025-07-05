@@ -18,21 +18,20 @@ namespace RedisServer.Listener
         private readonly ILogger<RedisServerListener> _logger;
 
         private readonly ICommandParser _commandParser;
-        private readonly IReplicaSocketService _replicaSocketService;
+    
         private readonly IServerInfoService _serverInfoService;
         private readonly IMetaCommandDispatcher _metaCommandDispatcher;
         private static readonly HashSet<string> SafeCommands = new() { "AUTH", "PING" };
         private readonly List<ICommandDispatcher> _commandDispatchers = new List<ICommandDispatcher>();
 
         public RedisServerListener(TcpListener tcpServer, ConnectionManager connectionManager, ILogger<RedisServerListener> logger, CommandDispatcher commandDispatcher,
-        ICommandParser commandParser, IReplicaSocketService replicaSocketService, IServerInfoService serverInfoService, IMetaCommandDispatcher metaCommandDispatcher,
+        ICommandParser commandParser, IServerInfoService serverInfoService, IMetaCommandDispatcher metaCommandDispatcher,
         LuaCommandDispatcher luaCommandDispatcher)
         {
             _tcpServer = tcpServer;
             _connectionManager = connectionManager;
             _logger = logger;
             _commandParser = commandParser;
-            _replicaSocketService = replicaSocketService;
             _serverInfoService = serverInfoService;
             _metaCommandDispatcher = metaCommandDispatcher;
 
@@ -115,13 +114,7 @@ namespace RedisServer.Listener
 
         private async Task ExecuteCommand(ParsedCommand command, Socket socket)
         {
-            if (CommandTypeMapper.TryParse(command.Name, out var type) &&
-        _serverInfoService.GetServerDataInfo().Role == ServerInfo.Model.Role.MASTER)
-            {
-                var serializedCommand = Serialization.SerializeCommandToRESP(command);
-
-                _replicaSocketService.Broadcast(serializedCommand);
-            }
+         
 
             try
             {

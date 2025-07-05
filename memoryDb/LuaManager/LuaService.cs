@@ -75,18 +75,15 @@ namespace RedisServer.LuaManager.Service
 
             var parsedCommand = new ParsedCommand { Name = commandName, Arguments = arguments };
 
-            // Call synchronously
             var task = _commandDispatcher.DispatchCommand(parsedCommand, _currentSocket);
-            task.Wait(); // Block until finished
+            task.Wait(); 
             var resultBytes = task.Result;
 
-            // Parse the RESP response to extract return value (e.g., bulk string, int)
             var first = resultBytes.FirstOrDefault();
             if (first == null) return null;
 
             var resp = Encoding.UTF8.GetString(first);
 
-            // Handle simple RESP decoding
             if (resp.StartsWith("$"))
             {
                 int i = resp.IndexOf("\r\n", StringComparison.Ordinal);
