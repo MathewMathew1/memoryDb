@@ -20,6 +20,13 @@ namespace RedisServer.LuaManager.Service
         public LuaService(ILogger<LuaService> logger, CommandDispatcher commandDispatcher)
         {
             _lua = new Lua();
+            _lua["os"] = null;
+            _lua["io"] = null;
+            _lua["debug"] = null;
+            _lua["package"] = null;
+            _lua["dofile"] = null;
+            _lua["loadfile"] = null;
+            _lua["require"] = null;
             _logger = logger;
             _lua.NewTable("redis");
             _lua.RegisterFunction("redis.call", this, GetType().GetMethod(nameof(RedisCall), BindingFlags.Instance | BindingFlags.NonPublic));
@@ -76,7 +83,7 @@ namespace RedisServer.LuaManager.Service
             var parsedCommand = new ParsedCommand { Name = commandName, Arguments = arguments };
 
             var task = _commandDispatcher.DispatchCommand(parsedCommand, _currentSocket);
-            task.Wait(); 
+            task.Wait();
             var resultBytes = task.Result;
 
             var first = resultBytes.FirstOrDefault();
