@@ -2,7 +2,6 @@ using System.Net.Sockets;
 using System.Text;
 using RedisServer.Command.Model;
 using RedisServer.RdbFile.Service;
-using RedisServer.Replication.Service;
 using RedisServer.ServerInfo.Service;
 
 namespace RedisServer.CommandHandlers.Service

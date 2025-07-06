@@ -2,9 +2,7 @@ using System.Net.Sockets;
 using System.Text;
 using RedisServer.Command.Model;
 using RedisServer.CommandHandlers.Model;
-using RedisServer.Database.Model;
 using RedisServer.Database.Service;
-
 
 namespace RedisServer.CommandHandlers.Service
 {

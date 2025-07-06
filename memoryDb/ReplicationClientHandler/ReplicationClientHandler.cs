@@ -3,8 +3,6 @@ using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using RedisServer.Command.Service;
-using RedisServer.CommandHandlers.Model;
-using RedisServer.CommandHandlers.Service;
 using RedisServer.RdbFile.Service;
 using RedisServer.ServerInfo.Service;
 

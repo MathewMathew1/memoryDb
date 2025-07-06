@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
-using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace RedisServer.Replication.Service

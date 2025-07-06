@@ -1,6 +1,5 @@
 using System.Net.Sockets;
 using System.Text;
-using NLua;
 using RedisServer.Command.Model;
 using RedisServer.LuaManager.Service;
 

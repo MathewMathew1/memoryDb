@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using RedisServer.ServerInfo.Model;
 
 namespace RedisServer.ServerInfo.Service

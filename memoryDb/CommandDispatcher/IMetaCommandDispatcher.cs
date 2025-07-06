@@ -1,4 +1,3 @@
-using System.Net.Sockets;
 using RedisServer.Command.Model;
 
 namespace RedisServer.Command.Service
