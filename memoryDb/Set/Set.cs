@@ -130,5 +130,19 @@ namespace RedisServer.Database.Service
                 return zSet.GetCardinality();
             }
         }
+
+        public int GetAmountByRange(string setKey, double min, double max)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return 0;
+                }
+
+                return zSet.GetAmountByRange(min, max);
+            }
+        
+        }
     }
 }

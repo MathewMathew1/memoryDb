@@ -158,6 +158,34 @@ namespace RedisServer.Database.Model
             return removed;
         }
 
+        public List<string> GetByRange(double min, double max)
+        {
+            var members = new List<string>();
+            var update = new SkipListNode[MaxLevel];
+            var current = _head;
+
+
+            while (current.Forward[0] != null && current.Forward[0].Score < min)
+            {
+                current = current.Forward[0];
+            }
+
+
+
+            current = current.Forward[0];
+
+            while (current != null && current.Score <= max)
+            {
+                string member = current.Member;
+
+                members.Add(member);
+
+                current = current.Forward[0];
+            }
+
+            return members;
+        }
+
         public int? GetRank(string member)
         {
             int? valueSearched = null;
@@ -165,7 +193,7 @@ namespace RedisServer.Database.Model
             var current = _head;
             var currentIndex = -1;
 
-            while (current!= null)
+            while (current != null)
             {
 
                 if (current.Member == member)
@@ -196,15 +224,15 @@ namespace RedisServer.Database.Model
                     valueFound = true;
                 }
                 current = current.Forward[0];
-                
+
                 if (valueFound)
                 {
                     currentIndex += 1;
                 }
-                
+
             }
 
-            return valueFound? currentIndex: null;
+            return valueFound ? currentIndex : null;
         }
 
 

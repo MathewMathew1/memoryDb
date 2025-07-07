@@ -96,6 +96,11 @@ namespace RedisServer.Database.Model
             return _keyValuePairs.Count; 
         }
 
+        public int GetAmountByRange(double min, double max)
+        {
+            return _skiplist.GetByRange(min, max).Count; ;
+        }
+
         public bool TryGetScore(string member, out double score) => _keyValuePairs.TryGetValue(member, out score);
     }
 }

@@ -274,7 +274,7 @@ namespace RedisServer.CommandHandlers.Service
         }
     }
 
-    
+
     public class ZCardCommand : ICommandHandler
     {
         private readonly ISetService _db;
@@ -295,8 +295,40 @@ namespace RedisServer.CommandHandlers.Service
 
             var key = command.Arguments[0];
             var count = _db.GetCardinality(key);
-         
-            
+
+
+            return new[] { Encoding.UTF8.GetBytes($":{count}\r\n") };
+        }
+    }
+
+    public class ZCountCommand : ICommandHandler
+    {
+        private readonly ISetService _db;
+
+        public ZCountCommand(ISetService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => "ZCount";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count != 3)
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'ZCard'\r\n") };
+            }
+
+            var key = command.Arguments[0];
+
+            if (!double.TryParse(command.Arguments[1], out var min) || !double.TryParse(command.Arguments[2], out var max))
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR min or max is not a valid double\r\n") };
+            }
+
+            var count = _db.GetAmountByRange(key, min, max);
+
+
             return new[] { Encoding.UTF8.GetBytes($":{count}\r\n") };
         }
     }

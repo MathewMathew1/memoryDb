@@ -11,5 +11,6 @@ namespace RedisServer.Database.Service
         int? GetRank(string setKey, string member);
         int? GetReverseRank(string setKey, string member);
         int GetCardinality(string setKey);
+        int GetAmountByRange(string setKey, double min, double max);
     }
 } 
