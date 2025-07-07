@@ -158,6 +158,55 @@ namespace RedisServer.Database.Model
             return removed;
         }
 
+        public int? GetRank(string member)
+        {
+            int? valueSearched = null;
+
+            var current = _head;
+            var currentIndex = -1;
+
+            while (current!= null)
+            {
+
+                if (current.Member == member)
+                {
+                    valueSearched = currentIndex;
+                    break;
+                }
+                current = current.Forward[0];
+                currentIndex += 1;
+            }
+
+            return valueSearched;
+        }
+
+        public int? GetReversRank(string member)
+        {
+
+            var current = _head;
+            var currentIndex = -1;
+
+            var valueFound = false;
+
+            while (current != null)
+            {
+
+                if (current.Member == member)
+                {
+                    valueFound = true;
+                }
+                current = current.Forward[0];
+                
+                if (valueFound)
+                {
+                    currentIndex += 1;
+                }
+                
+            }
+
+            return valueFound? currentIndex: null;
+        }
+
 
         public List<string> RemoveByRank(int start, int max)
         {

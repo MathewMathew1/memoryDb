@@ -212,6 +212,68 @@ namespace RedisServer.CommandHandlers.Service
         }
     }
 
+    public class ZRankCommand : ICommandHandler
+    {
+        private readonly ISetService _db;
+
+        public ZRankCommand(ISetService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => "ZRANK";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count != 2)
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'ZRank'\r\n") };
+            }
+
+            var key = command.Arguments[0];
+            var member = command.Arguments[1];
+
+            var rank = _db.GetRank(key, member);
+            if (rank == null)
+            {
+                return new[] { Encoding.UTF8.GetBytes(":-1\r\n") };
+            }
+
+            return new[] { Encoding.UTF8.GetBytes($":{rank}\r\n") };
+        }
+    }
+    
+    public class ZReverseRankCommand : ICommandHandler
+    {
+        private readonly ISetService _db;
+
+        public ZReverseRankCommand(ISetService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => "ZREVRANK";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count != 2)
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'ZRank'\r\n") };
+            }
+
+            var key = command.Arguments[0];
+            var member = command.Arguments[1];
+
+            var rank = _db.GetReverseRank(key, member);
+            if (rank == null)  
+            {
+                return new[] { Encoding.UTF8.GetBytes(":-1\r\n") };
+            }
+            
+            return new[] { Encoding.UTF8.GetBytes($":{rank}\r\n") };
+        }
+    }
+
 
 
 }

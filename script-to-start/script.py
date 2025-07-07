@@ -235,6 +235,21 @@ def test_zadd_zscore(master_sock):
 
     # Edge case: out-of-range
     print("ZREMRANGEBYRANK myzset 100 200 →", send_command(master_sock, "ZREMRANGEBYRANK myzset 100 200"))  # Should return :0
+    
+    print("ZADD myzsetRANK 3 memberD →", send_command(master_sock, "ZADD myzsetRANK 3 memberD"))
+    print("ZADD myzsetRANK 9 memberE →", send_command(master_sock, "ZADD myzsetRANK 9 memberE"))
+    print("ZADD myzsetRANK 11 memberF →", send_command(master_sock, "ZADD myzsetRANK 11 memberF"))
+
+    print("ZRANK myzsetRANK memberD →", send_command(master_sock, "ZRANK myzsetRANK memberD"))  # should be 0 or lowest
+    print("ZRANK myzsetRANK memberE →", send_command(master_sock, "ZRANK myzsetRANK memberE"))  # should be 1
+    print("ZRANK myzsetRANK memberF →", send_command(master_sock, "ZRANK myzsetRANK memberF"))  # should be 2
+    print("ZRANK myzsetRANK unknown →", send_command(master_sock, "ZRANK myzsetRANK unknown"))  # should be nil ($-1)
+
+    # ZREVRANK tests (descending rank: highest score = rank 0)
+    print("ZREVRANK myzsetRANK memberD →", send_command(master_sock, "ZREVRANK myzsetRANK memberD"))  # should be 2
+    print("ZREVRANK myzsetRANK memberE →", send_command(master_sock, "ZREVRANK myzsetRANK memberE"))  # should be 1
+    print("ZREVRANK myzsetRANK memberF →", send_command(master_sock, "ZREVRANK myzsetRANK memberF"))  # should be 0
+    print("ZREVRANK myzsetRANK unknown →", send_command(master_sock, "ZREVRANK myzsetRANK unknown"))  # should be nil ($-1)
 
 
 def run():

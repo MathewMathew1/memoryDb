@@ -78,7 +78,7 @@ namespace RedisServer.Database.Service
             }
         }
 
-         public int RemoveRangeByRank(string setKey, int start, int end)
+        public int RemoveRangeByRank(string setKey, int start, int end)
         {
             lock (_lock)
             {
@@ -88,6 +88,33 @@ namespace RedisServer.Database.Service
                 }
 
                 return _zSets[setKey].RemoveRangeByRank(setKey, start, end);
+            }
+        }
+
+        public int? GetRank(string setKey, string member)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return null;
+                }
+
+                return zSet.GetRank(member);
+            }
+        }
+
+        
+        public int? GetReverseRank(string setKey, string member)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return null;
+                }
+
+                return zSet.GetReversRank(member);
             }
         }
     }

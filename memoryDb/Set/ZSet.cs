@@ -81,6 +81,16 @@ namespace RedisServer.Database.Model
             return removedMembers.Count;
         }
 
+        public int? GetRank(string key)
+        {
+            return _skiplist.GetRank(key);
+        }
+
+        public int? GetReversRank(string key)
+        {
+            return _skiplist.GetReversRank(key);
+        }
+
         public bool TryGetScore(string member, out double score) => _keyValuePairs.TryGetValue(member, out score);
     }
 }

@@ -8,5 +8,7 @@ namespace RedisServer.Database.Service
         void DeleteMember(string setKey, string member);
         int RemoveRangeByScore(string setKey, double min, double max);
         int RemoveRangeByRank(string setKey, int start, int end);
+        int? GetRank(string setKey, string member);
+        int? GetReverseRank(string setKey, string member);
     }
 } 
