@@ -119,6 +119,43 @@ namespace RedisServer.Database.Model
             return true;
         }
 
+        public List<string> RemoveRangeByScore(double min, double max)
+        {
+            var removed = new List<string>();
+            var update = new SkipListNode[MaxLevel];
+            var current = _head;
+
+            for (int i = MaxLevel - 1; i >= 0; i--)
+            {
+                while (current.Forward[i] != null && current.Forward[i].Score < min)
+                {
+                    current = current.Forward[i];
+                }
+                update[i] = current;
+            }
+
+            current = current.Forward[0];
+            while (current != null && current.Score <= max)
+            {
+                var next = current.Forward[0];
+                string member = current.Member;
+
+                for (int i = 0; i < MaxLevel; i++)
+                {
+                    if (update[i].Forward[i] == current)
+                    {
+                        update[i].Forward[i] = current.Forward[i];
+                    }
+                }
+
+                removed.Add(member);
+                current = next;
+            }
+
+            return removed;
+        }
+
+
     }
 
     public class SkipListNode

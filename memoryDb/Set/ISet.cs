@@ -6,5 +6,6 @@ namespace RedisServer.Database.Service
         public double? TryGetScore(string setKey, string member);
         double IncreaseBy(string setKey, string member, double increaseBy);
         void DeleteMember(string setKey, string member);
+        int RemoveRangeByScore(string setKey, double min, double max);
     }
 } 

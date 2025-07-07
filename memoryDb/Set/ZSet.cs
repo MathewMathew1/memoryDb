@@ -55,6 +55,19 @@ namespace RedisServer.Database.Model
             }
         }
 
+        public int RemoveRangeByScore(string key, double min, double max)
+        {
+
+            var removedMembers = _skiplist.RemoveRangeByScore(min, max);
+
+            foreach (var member in removedMembers)
+            {
+                _keyValuePairs.Remove(member, out _);
+            }
+
+            return removedMembers.Count;
+        }
+
         public bool TryGetScore(string member, out double score) => _keyValuePairs.TryGetValue(member, out score);
     }
 }

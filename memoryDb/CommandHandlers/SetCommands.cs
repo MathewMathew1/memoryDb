@@ -154,5 +154,35 @@ namespace RedisServer.CommandHandlers.Service
         }
     }
 
+    public class ZREMRANGEBYSCORECommand : ICommandHandler
+    {
+        private readonly ISetService _db;
+
+        public ZREMRANGEBYSCORECommand(ISetService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => CommandType.ZREMRANGEBYSCORE.ToString().ToLowerInvariant();
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count != 3)
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'zremrangebyscore'\r\n") };
+            }
+
+            var key = command.Arguments[0];
+            if (!double.TryParse(command.Arguments[1], out var min) || !double.TryParse(command.Arguments[2], out var max))
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR min or max is not a valid double\r\n") };
+            }
+
+            var removed = _db.RemoveRangeByScore(key, min, max);
+            return new[] { Encoding.UTF8.GetBytes($":{removed}\r\n") };
+        }
+    }
+
+
 
 }

@@ -64,5 +64,18 @@ namespace RedisServer.Database.Service
 
             return score;
         }
+
+        public int RemoveRangeByScore(string setKey, double min, double max)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return 0;
+                }
+
+                return _zSets[setKey].RemoveRangeByScore(setKey, min, max);
+            }
+        }
     }
 }
