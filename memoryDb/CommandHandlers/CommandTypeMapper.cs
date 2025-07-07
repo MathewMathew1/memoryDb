@@ -12,7 +12,10 @@ namespace RedisServer.CommandHandlers.Model
             ["rpop"] = CommandType.RPOP,
             ["LREM"] = CommandType.LREM,
             ["incrBy"] = CommandType.INCRBY,
-            ["incr"]  = CommandType.INCR
+            ["incr"] = CommandType.INCR,
+            ["zaad"] = CommandType.ZADD,
+            ["zincryby"] = CommandType.ZINCRBY,
+            ["zrem"] = CommandType.ZREM,
         };
 
         public static bool TryParse(string commandName, out CommandType commandType)

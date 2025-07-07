@@ -36,7 +36,6 @@ namespace RedisServer.RdbFile.Service
             var fullPath = Path.Combine(data.dir, data.dbFileName);
           
             byte[] allBytes = File.ReadAllBytes(fullPath);
-            _logger.LogInformation(BitConverter.ToString(allBytes).Replace("-", " "));
 
             if (!File.Exists(fullPath))
                 return new List<string>();
@@ -104,9 +103,9 @@ namespace RedisServer.RdbFile.Service
         {
             var data = _serverInfoService.GetServerDataInfo();
             var fullPath = Path.Combine(data.dir, data.dbFileName);
-              _logger.LogInformation("RDB path: " + Path.GetFullPath(Path.Combine(data.dir, data.dbFileName)));
+
             if (!File.Exists(fullPath)) return;
-             _logger.LogInformation("is here");
+         
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
             using var reader = new BinaryReader(stream);
 
@@ -121,7 +120,7 @@ namespace RedisServer.RdbFile.Service
                 {
                     long pos = reader.BaseStream.Position;
                     int opCode = reader.ReadByte();
-                    _logger.LogDebug($"@{pos}: opcode {opCode:X2}");
+
 
                     switch (opCode)
                     {
@@ -174,7 +173,6 @@ namespace RedisServer.RdbFile.Service
 
                                     if (delta < 0)
                                     {
-                                        _logger.LogInformation($"Key '{key}' expired during load. Skipping.");
                                         expireAtMs = null;
                                         continue;
                                     }
@@ -209,17 +207,14 @@ namespace RedisServer.RdbFile.Service
 
             if (listLen < 0)
             {
-                _logger.LogWarning($"Invalid list length {listLen} for key '{key}'");
                 return;
             }
-            _logger.LogDebug($"@{key}: key");
             for (int i = 0; i < listLen; i++)
             {
                 string value = ByteRdbParser.ReadLengthPrefixedString(reader);
                 _listService.AddRight(key, value);
             }
 
-            _logger.LogInformation($"Loaded list '{key}' with {listLen} elements.");
         }
 
         private void GetSteam(BinaryReader reader)

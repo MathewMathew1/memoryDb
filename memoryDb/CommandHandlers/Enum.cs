@@ -10,6 +10,9 @@ namespace RedisServer.CommandHandlers.Model
         RPOP,
         LREM,
         INCRBY,
-        INCR
+        INCR,
+        ZADD,
+        ZINCRBY,
+        ZREM
     }
 }

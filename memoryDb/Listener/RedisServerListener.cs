@@ -129,6 +129,9 @@ namespace RedisServer.Listener
                     {
                         await socket.SendAsync(value, SocketFlags.None);
                     }
+                }else{
+                    var errorMessage = $"-ERR invalid command {command.Name}\r\n";
+                    await socket.SendAsync(Encoding.UTF8.GetBytes(errorMessage), SocketFlags.None);
                 }
             }
             catch (Exception e)

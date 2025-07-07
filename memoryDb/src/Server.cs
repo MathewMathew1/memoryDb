@@ -65,6 +65,7 @@ namespace RedisServer.App
                     services.AddSingleton<ICommandParser, CommandParser>();
                     services.AddSingleton<IStringService, StringService>();
                     services.AddSingleton<IStreamService, StreamService>();
+                    services.AddSingleton<ISetService, SetService>();
                     services.AddSingleton<IListDatabase, ListDatabase>();
                     services.AddSingleton<IMemoryDatabaseRouter, MemoryDatabaseRouter>();
                     services.AddSingleton<IRdbFileBuilderService, RdbFileBuilderService>();
