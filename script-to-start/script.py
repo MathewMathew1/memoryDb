@@ -246,6 +246,7 @@ def test_zadd_zscore(master_sock):
     print("ZRANK myzsetRANK unknown →", send_command(master_sock, "ZRANK myzsetRANK unknown"))  # should be nil ($-1)
 
     # ZREVRANK tests (descending rank: highest score = rank 0)
+    print("ZCARD myzsetRANK →", send_command(master_sock, "ZCARD myzsetRANK"))  # should be 3
     print("ZREVRANK myzsetRANK memberD →", send_command(master_sock, "ZREVRANK myzsetRANK memberD"))  # should be 2
     print("ZREVRANK myzsetRANK memberE →", send_command(master_sock, "ZREVRANK myzsetRANK memberE"))  # should be 1
     print("ZREVRANK myzsetRANK memberF →", send_command(master_sock, "ZREVRANK myzsetRANK memberF"))  # should be 0

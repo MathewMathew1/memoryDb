@@ -91,6 +91,11 @@ namespace RedisServer.Database.Model
             return _skiplist.GetReversRank(key);
         }
 
+        public int GetCardinality()
+        {
+            return _keyValuePairs.Count; 
+        }
+
         public bool TryGetScore(string member, out double score) => _keyValuePairs.TryGetValue(member, out score);
     }
 }

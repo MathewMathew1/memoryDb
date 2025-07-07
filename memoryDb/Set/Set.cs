@@ -104,7 +104,7 @@ namespace RedisServer.Database.Service
             }
         }
 
-        
+
         public int? GetReverseRank(string setKey, string member)
         {
             lock (_lock)
@@ -115,6 +115,19 @@ namespace RedisServer.Database.Service
                 }
 
                 return zSet.GetReversRank(member);
+            }
+        }
+
+        public int GetCardinality(string setKey)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return 0;
+                }
+
+                return zSet.GetCardinality();
             }
         }
     }

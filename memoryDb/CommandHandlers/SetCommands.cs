@@ -242,7 +242,7 @@ namespace RedisServer.CommandHandlers.Service
             return new[] { Encoding.UTF8.GetBytes($":{rank}\r\n") };
         }
     }
-    
+
     public class ZReverseRankCommand : ICommandHandler
     {
         private readonly ISetService _db;
@@ -265,15 +265,40 @@ namespace RedisServer.CommandHandlers.Service
             var member = command.Arguments[1];
 
             var rank = _db.GetReverseRank(key, member);
-            if (rank == null)  
+            if (rank == null)
             {
                 return new[] { Encoding.UTF8.GetBytes(":-1\r\n") };
             }
-            
+
             return new[] { Encoding.UTF8.GetBytes($":{rank}\r\n") };
         }
     }
 
+    
+    public class ZCardCommand : ICommandHandler
+    {
+        private readonly ISetService _db;
 
+        public ZCardCommand(ISetService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => "ZCard";
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count != 1)
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'ZCard'\r\n") };
+            }
+
+            var key = command.Arguments[0];
+            var count = _db.GetCardinality(key);
+         
+            
+            return new[] { Encoding.UTF8.GetBytes($":{count}\r\n") };
+        }
+    }
 
 }

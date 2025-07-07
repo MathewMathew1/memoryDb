@@ -45,6 +45,7 @@ namespace RedisServer.CommandHandlers.Service
             services.AddSingleton<ICommandHandler, ZREMRANGEBYRANKCommand>();
             services.AddSingleton<ICommandHandler, ZRankCommand>();
             services.AddSingleton<ICommandHandler, ZReverseRankCommand>();
+            services.AddSingleton<ICommandHandler, ZCardCommand>();
 
             services.AddSingleton<ILuaCommandHandler, EvalCommand>();
             services.AddSingleton<ILuaCommandHandler, EvalShaCommand>();
