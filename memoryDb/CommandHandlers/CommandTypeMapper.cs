@@ -16,7 +16,8 @@ namespace RedisServer.CommandHandlers.Model
             ["zaad"] = CommandType.ZADD,
             ["zincryby"] = CommandType.ZINCRBY,
             ["zrem"] = CommandType.ZREM,
-            ["zremrangebyscore"] = CommandType.ZREMRANGEBYSCORE
+            ["zremrangebyscore"] = CommandType.ZREMRANGEBYSCORE,
+            ["zremrangebyrank"] = CommandType.ZREMRANGEBYRANK
         };
 
         public static bool TryParse(string commandName, out CommandType commandType)

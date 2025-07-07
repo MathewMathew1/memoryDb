@@ -40,8 +40,9 @@ def read_line(sock):
 
 def read_bulk_string(sock):
     length = int(read_line(sock))
+
     if length == -1:
-        return None
+        return "null"
     data = b""
     while len(data) < length + 2:
         data += sock.recv(length + 2 - len(data))
@@ -181,6 +182,61 @@ def runTestForScripts(master_sock, ):
     result_post_flush = send_command(master_sock, evalsha_cmd)
     print("EVALSHA after FLUSHALL", result_post_flush)  # 
 
+def test_zadd_zscore(master_sock):
+    print("ZADD myzset 10.5 member1 →", send_command(master_sock, "ZADD myzset 10.5 member1"))
+    print("ZADD myzset 5 member2 →", send_command(master_sock, "ZADD myzset 5 member2"))
+    print("ZADD myzset 20.1 member1 →", send_command(master_sock, "ZADD myzset 20.1 member1"))  # update score
+
+    print("ZSCORE myzset member1 →", send_command(master_sock, "ZSCORE myzset member1"))  # should be 20.1
+    print("ZSCORE myzset member2 →", send_command(master_sock, "ZSCORE myzset member2"))  # should be 5
+    print("ZSCORE myzset unknown →", send_command(master_sock, "ZSCORE myzset unknown"))  # should be nil
+
+    print("ZINCRBY myzset 4.9 member2 →", send_command(master_sock, "ZINCRBY myzset 4.9 member2"))  # should be 9.9
+    print("ZSCORE myzset member2 →", send_command(master_sock, "ZSCORE myzset member2"))  # should now be 9.9
+
+    print("ZREM myzset member1 →", send_command(master_sock, "ZREM myzset member1"))  # should return :1
+    print("ZREM myzset unknown →", send_command(master_sock, "ZREM myzset unknown"))  # should return :0
+    print("ZSCORE myzset member1 →", send_command(master_sock, "ZSCORE myzset member1"))  # should be nil
+
+    # Add more members for range testing
+    print("ZADD myzset 1 memberA →", send_command(master_sock, "ZADD myzset 1 memberA"))
+    print("ZADD myzset 3 memberB →", send_command(master_sock, "ZADD myzset 3 memberB"))
+    print("ZADD myzset 6 memberC →", send_command(master_sock, "ZADD myzset 6 memberC"))
+
+    print("ZSCORE myzset memberA →", send_command(master_sock, "ZSCORE myzset memberA"))  # should be 1
+    print("ZSCORE myzset memberB →", send_command(master_sock, "ZSCORE myzset memberB"))  # should be 3
+    print("ZSCORE myzset memberC →", send_command(master_sock, "ZSCORE myzset memberC"))  # should be 6
+
+    # Remove members by score range
+    print("ZREMRANGEBYSCORE myzset 1 5 →", send_command(master_sock, "ZREMRANGEBYSCORE myzset 1 5"))  # should remove A and B
+    print("ZSCORE myzset memberA →", send_command(master_sock, "ZSCORE myzset memberA"))  # should be nil
+    print("ZSCORE myzset memberB →", send_command(master_sock, "ZSCORE myzset memberB"))  # should be nil
+    print("ZSCORE myzset memberC →", send_command(master_sock, "ZSCORE myzset memberC"))  # should still be 6
+
+    # Edge case: empty removal
+    print("ZREMRANGEBYSCORE myzset 100 200 →", send_command(master_sock, "ZREMRANGEBYSCORE myzset 100 200"))  # should return :0
+
+    print("ZADD myzset 2 memberX →", send_command(master_sock, "ZADD myzset 2 memberX"))
+    print("ZADD myzset 4 memberY →", send_command(master_sock, "ZADD myzset 4 memberY"))
+    print("ZADD myzset 7 memberZ →", send_command(master_sock, "ZADD myzset 7 memberZ"))
+
+    # Confirm scores
+    print("ZSCORE myzset memberX →", send_command(master_sock, "ZSCORE myzset memberX"))
+    print("ZSCORE myzset memberY →", send_command(master_sock, "ZSCORE myzset memberY"))
+    print("ZSCORE myzset memberZ →", send_command(master_sock, "ZSCORE myzset memberZ"))
+
+    # Remove by rank (rank 0 is lowest score)
+    print("ZREMRANGEBYRANK myzset 0 1 →", send_command(master_sock, "ZREMRANGEBYRANK myzset 0 1"))  # Should remove 2 lowest
+
+    # Confirm removals
+    print("ZSCORE myzset memberA →", send_command(master_sock, "ZSCORE myzset memberA"))  # Possibly already removed by score
+    print("ZSCORE myzset memberX →", send_command(master_sock, "ZSCORE myzset memberX"))  # Should be nil
+    print("ZSCORE myzset memberY →", send_command(master_sock, "ZSCORE myzset memberY"))  # Should be present or not depending on rank
+
+    # Edge case: out-of-range
+    print("ZREMRANGEBYRANK myzset 100 200 →", send_command(master_sock, "ZREMRANGEBYRANK myzset 100 200"))  # Should return :0
+
+
 def run():
     procs = []
     try:
@@ -234,6 +290,7 @@ def run():
                     'EVAL "redis.call(\'set\', KEYS[1], ARGV[1]); redis.call(\'incrby\', KEYS[1], ARGV[2]); redis.call(\'incrby\', KEYS[1], ARGV[3]); redis.call(\'incrby\', KEYS[1], ARGV[4]); return redis.call(\'get\', KEYS[1])" 1 counter 5 10 15 20',
                 ),
             )
+            test_zadd_zscore(master_sock)
             runTestForScripts(master_sock)
             print("GET counter_key →", send_command(master_sock, "GET counter"))
             print("GET early_key →", send_command(master_sock, "GET early_key"))

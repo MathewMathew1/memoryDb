@@ -42,6 +42,7 @@ namespace RedisServer.CommandHandlers.Service
             services.AddSingleton<ICommandHandler, ZINCRBYCommand>();
             services.AddSingleton<ICommandHandler, ZREMCommand>();
             services.AddSingleton<ICommandHandler, ZREMRANGEBYSCORECommand>();
+            services.AddSingleton<ICommandHandler, ZREMRANGEBYRANKCommand>();
 
             services.AddSingleton<ILuaCommandHandler, EvalCommand>();
             services.AddSingleton<ILuaCommandHandler, EvalShaCommand>();

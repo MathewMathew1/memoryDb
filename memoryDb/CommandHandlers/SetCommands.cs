@@ -183,6 +183,35 @@ namespace RedisServer.CommandHandlers.Service
         }
     }
 
+    public class ZREMRANGEBYRANKCommand : ICommandHandler
+    {
+        private readonly ISetService _db;
+
+        public ZREMRANGEBYRANKCommand(ISetService db)
+        {
+            _db = db;
+        }
+
+        public string CommandName => CommandType.ZREMRANGEBYRANK.ToString().ToLowerInvariant();
+
+        public async Task<IEnumerable<byte[]>> Handle(ParsedCommand command, Socket socket)
+        {
+            if (command.Arguments.Count != 3)
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR wrong number of arguments for 'zremrangebyrank'\r\n") };
+            }
+
+            var key = command.Arguments[0];
+            if (!int.TryParse(command.Arguments[1], out var start) || !int.TryParse(command.Arguments[2], out var end))
+            {
+                return new[] { Encoding.UTF8.GetBytes("-ERR start or end is not a valid double\r\n") };
+            }
+
+            var removed = _db.RemoveRangeByRank(key, start, end);
+            return new[] { Encoding.UTF8.GetBytes($":{removed}\r\n") };
+        }
+    }
+
 
 
 }

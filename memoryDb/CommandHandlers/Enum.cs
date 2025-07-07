@@ -14,6 +14,7 @@ namespace RedisServer.CommandHandlers.Model
         ZADD,
         ZINCRBY,
         ZREM,
-        ZREMRANGEBYSCORE
+        ZREMRANGEBYSCORE,
+        ZREMRANGEBYRANK
     }
 }

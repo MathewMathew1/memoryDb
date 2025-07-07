@@ -125,22 +125,24 @@ namespace RedisServer.Database.Model
             var update = new SkipListNode[MaxLevel];
             var current = _head;
 
-            for (int i = MaxLevel - 1; i >= 0; i--)
+            for (var i = MaxLevel - 1; i >= 0; i--)
             {
                 while (current.Forward[i] != null && current.Forward[i].Score < min)
                 {
                     current = current.Forward[i];
                 }
+
                 update[i] = current;
             }
 
             current = current.Forward[0];
+
             while (current != null && current.Score <= max)
             {
                 var next = current.Forward[0];
                 string member = current.Member;
 
-                for (int i = 0; i < MaxLevel; i++)
+                for (var i = 0; i < MaxLevel; i++)
                 {
                     if (update[i].Forward[i] == current)
                     {
@@ -149,6 +151,7 @@ namespace RedisServer.Database.Model
                 }
 
                 removed.Add(member);
+
                 current = next;
             }
 
@@ -156,20 +159,60 @@ namespace RedisServer.Database.Model
         }
 
 
-    }
-
-    public class SkipListNode
-    {
-        public double Score;
-        public string Member;
-        public SkipListNode[] Forward;
-
-        public SkipListNode(double score, string member, int level)
+        public List<string> RemoveByRank(int start, int max)
         {
-            Score = score;
-            Member = member;
-            Forward = new SkipListNode[level];
-        }
-    }
+            var removed = new List<string>();
+            var update = new SkipListNode[MaxLevel];
+            var current = _head;
+            int currentIndex = -1;
 
+            while (currentIndex + 1 < start && current.Forward[0] != null)
+            {
+                current = current.Forward[0];
+                currentIndex++;
+            }
+
+            for (int i = 0; i < MaxLevel; i++)
+            {
+                update[i] = current;
+            }
+
+            var node = current.Forward[0];
+            int rank = start;
+            while (node != null && rank <= max)
+            {
+                removed.Add(node.Member);
+                node = node.Forward[0];
+                rank++;
+            }
+
+            for (int i = 0; i < MaxLevel; i++)
+            {
+                var temp = update[i].Forward[i];
+                while (temp != null && removed.Contains(temp.Member))
+                {
+                    temp = temp.Forward[i];
+                }
+                update[i].Forward[i] = temp;
+            }
+
+            return removed;
+        }
+
+
+        public class SkipListNode
+        {
+            public double Score;
+            public string Member;
+            public SkipListNode[] Forward;
+
+            public SkipListNode(double score, string member, int level)
+            {
+                Score = score;
+                Member = member;
+                Forward = new SkipListNode[level];
+            }
+        }
+
+    }
 }
