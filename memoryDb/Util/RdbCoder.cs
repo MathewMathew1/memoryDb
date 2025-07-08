@@ -68,7 +68,7 @@ namespace RedisServer.Util.Serialization
 
 
 
-    
+
 
         public static void WriteLengthPrefixedString(BinaryWriter writer, string s)
         {
@@ -96,5 +96,16 @@ namespace RedisServer.Util.Serialization
                 writer.Write(bytes);
             }
         }
+
+        public static void WriteDouble(BinaryWriter writer, double value)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes); 
+
+            writer.Write(bytes);
+        }
+
     }
 }

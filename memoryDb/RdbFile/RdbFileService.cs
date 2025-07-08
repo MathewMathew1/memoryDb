@@ -15,15 +15,17 @@ namespace RedisServer.RdbFile.Service
         private IStringService _stringService;
         private IStreamService _streamService;
         private IListDatabase _listService;
+        private ISetService _setService;
 
         public RdbFileService(ILogger<RdbFileService> logger, IServerInfoService serverInfoService, IStringService stringService,
-        IStreamService streamService, IListDatabase listDatabase)
+        IStreamService streamService, IListDatabase listDatabase, ISetService setService)
         {
             _logger = logger;
             _serverInfoService = serverInfoService;
             _stringService = stringService;
             _streamService = streamService;
             _listService = listDatabase;
+            _setService = setService;
 
             LoadRdbIntoMemory();
         }
@@ -151,8 +153,12 @@ namespace RedisServer.RdbFile.Service
                             expireAtMs = ms;
                             break;
 
-                        case 0x02: // list
+                        case 0x02: 
                             GetLists(reader);
+                            break;
+
+                        case 0x03: 
+                            GetSet(reader);
                             break;
 
                         case 0x15: // Stream
@@ -213,6 +219,26 @@ namespace RedisServer.RdbFile.Service
             {
                 string value = ByteRdbParser.ReadLengthPrefixedString(reader);
                 _listService.AddRight(key, value);
+            }
+
+        }
+
+         private void GetSet(BinaryReader reader)
+        {
+            string key = ByteRdbParser.ReadLengthPrefixedString(reader);
+    
+            int listLen = ByteRdbParser.ReadLengthEncodedInt(reader);
+
+            if (listLen < 0)
+            {
+                return;
+            }
+            for (int i = 0; i < listLen; i++)
+            {
+                string member = ByteRdbParser.ReadLengthPrefixedString(reader);
+                double value = ByteRdbParser.ReadDouble(reader);
+                
+                _setService.AddOrUpdate(key, member, value);
             }
 
         }

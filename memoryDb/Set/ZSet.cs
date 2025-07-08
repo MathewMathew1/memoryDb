@@ -110,7 +110,11 @@ namespace RedisServer.Database.Model
         {
             return _skiplist.GetByIndex(start, end);
         }
-        
+
+        public ConcurrentDictionary<string, double> GetAll()
+        {
+            return _keyValuePairs;
+        }
 
         public bool TryGetScore(string member, out double score) => _keyValuePairs.TryGetValue(member, out score);
     }

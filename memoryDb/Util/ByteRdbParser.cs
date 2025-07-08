@@ -73,6 +73,14 @@ namespace RedisServer.Util.Serialization
             }
         }
 
+        public static double ReadDouble(BinaryReader reader)
+        {
+            byte[] bytes = reader.ReadBytes(8);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+
+            return BitConverter.ToDouble(bytes, 0);
+        }
 
 
         public static string ReadLengthPrefixedString(BinaryReader reader)

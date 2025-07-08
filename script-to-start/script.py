@@ -487,6 +487,7 @@ def run():
                 "XRANGE from LATE REPLICA",
                 send_command(late_replica_sock, "XRANGE mystream - +"),
             )
+            print("ZRangeByScore LATE REPLICA myzsetRANK 3 10 WITHSCORES →", send_command(late_replica_sock, "ZRangeByScore myzsetRANK 3 10 WITHSCORES")) 
             print(
                 "LRANGE LATE REPLICA list1 0 -1 →",
                 send_command(late_replica_sock, "LRANGE list1 0 -1"),

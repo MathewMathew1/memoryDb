@@ -8,7 +8,10 @@ namespace RedisServer.Database.Service
         private readonly ConcurrentDictionary<string, ZSet> _zSets = new ConcurrentDictionary<string, ZSet>();
         private readonly object _lock = new();
 
-
+        public Dictionary<string, ZSet> GetAllSnapshot()
+        {
+            return new Dictionary<string, ZSet>(_zSets);
+        }
 
         public void AddOrUpdate(string setKey, string member, double value)
         {

@@ -14,24 +14,27 @@ namespace RedisServer.RdbFile.Service
         private readonly IStreamService _steamService;
         private readonly IListDatabase _listDatabase;
         private readonly ILogger<RdbFileBuilderService> _logger;
+        private readonly ISetService _setService;
 
         private const string RDB_MAGIC = "REDIS";
         private const string RDB_VERSION = "0009";
 
         public RdbFileBuilderService(IServerInfoService serverInfoService, IStringService stringService,
-        ILogger<RdbFileBuilderService> logger, IStreamService streamService, IListDatabase listDatabase)
+        ILogger<RdbFileBuilderService> logger, IStreamService streamService, IListDatabase listDatabase,
+        ISetService setService)
         {
             _serverInfoService = serverInfoService;
             _stringService = stringService;
             _logger = logger;
             _steamService = streamService;
             _listDatabase = listDatabase;
+            _setService = setService;
         }
 
         public void WriteRdbFromMemory()
         {
             var data = _serverInfoService.GetServerDataInfo();
-     
+
             var fullPath = Path.Combine(data.dir, data.dbFileName);
 
             using var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
@@ -43,6 +46,7 @@ namespace RedisServer.RdbFile.Service
             HandleStrings(writer);
             HandleSteams(writer);
             HandleList(writer);
+            HandleSets(writer);
 
             writer.Write((byte)0xFF); // EOF
             writer.Flush();
@@ -74,7 +78,7 @@ namespace RedisServer.RdbFile.Service
         private void HandleSteams(BinaryWriter writer)
         {
             var streams = _steamService.GetAllSnapshot();
-  
+
             foreach (var pair in streams)
             {
 
@@ -89,8 +93,6 @@ namespace RedisServer.RdbFile.Service
 
 
                 var lastId = entries[entries.Count - 1].Key;
-                //StoreSteamId(lastId, writer);
-
 
                 Dictionary<string, List<KeyValuePair<string, StreamEntry>>> timeGroups = new();
 
@@ -119,10 +121,37 @@ namespace RedisServer.RdbFile.Service
             }
         }
 
+        private void HandleSets(BinaryWriter writer)
+        {
+            var sets = _setService.GetAllSnapshot();
+
+            foreach (var set in sets)
+            {
+
+                writer.Write((byte)0x03); 
+
+                RdbCoder.WriteLengthPrefixedString(writer, set.Key);
+
+                var entries = set.Value.GetAll().ToList();
+
+                RdbCoder.WriteLength(writer, entries.Count);
+
+                foreach (var entry in entries)
+                {
+
+                    RdbCoder.WriteLengthPrefixedString(writer, entry.Key);
+                    RdbCoder.WriteDouble(writer, entry.Value); 
+                }
+
+
+
+            }
+        }
+
         private void HandleStrings(BinaryWriter writer)
         {
             var strings = GetSnapshot();
-    
+
             foreach (var pair in strings)
             {
                 if (pair.Value.expirationDate is DateTime exp)
