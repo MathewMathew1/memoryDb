@@ -239,6 +239,8 @@ def test_zadd_zscore(master_sock):
     print("ZADD myzsetRANK 3 memberD →", send_command(master_sock, "ZADD myzsetRANK 3 memberD"))
     print("ZADD myzsetRANK 9 memberE →", send_command(master_sock, "ZADD myzsetRANK 9 memberE"))
     print("ZADD myzsetRANK 11 memberF →", send_command(master_sock, "ZADD myzsetRANK 11 memberF"))
+    print("ZADD myzsetRANK 6 memberH →", send_command(master_sock, "ZADD myzsetRANK 6 memberH"))
+    print("ZADD myzsetRANK 15 memberG →", send_command(master_sock, "ZADD myzsetRANK 15 memberG"))
 
     print("ZRANK myzsetRANK memberD →", send_command(master_sock, "ZRANK myzsetRANK memberD"))  # should be 0 or lowest
     print("ZRANK myzsetRANK memberE →", send_command(master_sock, "ZRANK myzsetRANK memberE"))  # should be 1
@@ -248,6 +250,11 @@ def test_zadd_zscore(master_sock):
     # ZREVRANK tests (descending rank: highest score = rank 0)
     print("ZCARD myzsetRANK →", send_command(master_sock, "ZCARD myzsetRANK")) 
     print("ZCOUNT myzsetRANK 2 10 →", send_command(master_sock, "ZCOUNT myzsetRANK 2 10")) # should be 2
+    print("ZRangeByScore myzsetRANK 3 10 WITHSCORES →", send_command(master_sock, "ZRangeByScore myzsetRANK 3 10 WITHSCORES")) 
+    print("ZRevRangeByScore myzsetRANK 10 3 WITHSCORES →", send_command(master_sock, "ZRevRangeByScore myzsetRANK 10 3 WITHSCORES")) 
+    print("ZRange myzsetRANK 0 2 WITHSCORES →", send_command(master_sock, "ZRange myzsetRANK 0 2 WITHSCORES")) 
+    print("ZRange myzsetRANK 2 4 WITHSCORES →", send_command(master_sock, "ZRange myzsetRANK 2 4 WITHSCORES"))
+    print("ZReverseRange myzsetRANK 2 4 WITHSCORES →", send_command(master_sock, "ZRevRange myzsetRANK 4 2 WITHSCORES"))
     print("ZREVRANK myzsetRANK memberD →", send_command(master_sock, "ZREVRANK myzsetRANK memberD"))  # should be 2
     print("ZREVRANK myzsetRANK memberE →", send_command(master_sock, "ZREVRANK myzsetRANK memberE"))  # should be 1
     print("ZREVRANK myzsetRANK memberF →", send_command(master_sock, "ZREVRANK myzsetRANK memberF"))  # should be 0
