@@ -2,7 +2,6 @@ using System.Net.Sockets;
 using System.Text;
 using RedisServer.Command.Model;
 using RedisServer.CommandHandlers.Model;
-using RedisServer.Database.Model;
 using RedisServer.Database.Service;
 
 
@@ -204,7 +203,7 @@ namespace RedisServer.CommandHandlers.Service
             var key = command.Arguments[0];
             if (!int.TryParse(command.Arguments[1], out var start) || !int.TryParse(command.Arguments[2], out var end))
             {
-                return new[] { Encoding.UTF8.GetBytes("-ERR start or end is not a valid double\r\n") };
+                return new[] { Encoding.UTF8.GetBytes("-ERR start or end is not a valid int\r\n") };
             }
 
             var removed = _db.RemoveRangeByRank(key, start, end);

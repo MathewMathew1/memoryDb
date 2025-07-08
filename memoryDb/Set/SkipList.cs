@@ -158,10 +158,9 @@ namespace RedisServer.Database.Model
             return removed;
         }
 
-        public List<string> GetByRange(double min, double max)
+        public List<SkiplistData> GetByRange(double min, double max)
         {
-            var members = new List<string>();
-            var update = new SkipListNode[MaxLevel];
+            var members = new List<SkiplistData>();
             var current = _head;
 
 
@@ -170,21 +169,42 @@ namespace RedisServer.Database.Model
                 current = current.Forward[0];
             }
 
-
-
             current = current.Forward[0];
 
             while (current != null && current.Score <= max)
             {
-                string member = current.Member;
-
-                members.Add(member);
+                members.Add( new SkiplistData {Member = current.Member, Score = current.Score});
 
                 current = current.Forward[0];
             }
 
             return members;
         }
+
+        public List<SkiplistData> GetByIndex(int start, int end)
+        {
+            var members = new List<SkiplistData>();
+            var current = _head;
+            var currentIndex = -1;
+
+            while (current.Forward[0] != null && currentIndex < start)
+            {
+                current = current.Forward[0];
+                currentIndex += 1;
+            }
+
+
+            while (current != null && currentIndex <= end)
+            {
+                members.Add(new SkiplistData { Member = current.Member, Score = current.Score });
+
+                current = current.Forward[0];
+                currentIndex += 1;
+            }
+
+            return members;
+        }
+
 
         public int? GetRank(string member)
         {

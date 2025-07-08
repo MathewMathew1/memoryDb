@@ -93,13 +93,24 @@ namespace RedisServer.Database.Model
 
         public int GetCardinality()
         {
-            return _keyValuePairs.Count; 
+            return _keyValuePairs.Count;
         }
 
         public int GetAmountByRange(double min, double max)
         {
-            return _skiplist.GetByRange(min, max).Count; ;
+            return _skiplist.GetByRange(min, max).Count; 
         }
+
+        public List<SkiplistData> GetByRange(double min, double max)
+        {
+            return _skiplist.GetByRange(min, max);
+        }
+
+        public List<SkiplistData> GetByIndex(int start, int end)
+        {
+            return _skiplist.GetByIndex(start, end);
+        }
+        
 
         public bool TryGetScore(string member, out double score) => _keyValuePairs.TryGetValue(member, out score);
     }

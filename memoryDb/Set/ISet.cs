@@ -1,3 +1,5 @@
+using RedisServer.Database.Model;
+
 namespace RedisServer.Database.Service
 {
     public interface ISetService
@@ -12,5 +14,7 @@ namespace RedisServer.Database.Service
         int? GetReverseRank(string setKey, string member);
         int GetCardinality(string setKey);
         int GetAmountByRange(string setKey, double min, double max);
+        List<SkiplistData> GetByRange(string setKey, double min, double max);
+        List<SkiplistData> GetByIndexRange(string setKey, int start, int end);
     }
 } 

@@ -142,7 +142,36 @@ namespace RedisServer.Database.Service
 
                 return zSet.GetAmountByRange(min, max);
             }
-        
+
+        }
+
+
+        public List<SkiplistData> GetByRange(string setKey, double min, double max)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return new List<SkiplistData>();
+                }
+
+                return zSet.GetByRange(min, max);
+            }
+
+        }
+
+        public List<SkiplistData> GetByIndexRange(string setKey, int start, int end)
+        {
+            lock (_lock)
+            {
+                if (!_zSets.TryGetValue(setKey, out var zSet))
+                {
+                    return new List<SkiplistData>();
+                }
+
+                return zSet.GetByIndex(start, end);
+            }
+
         }
     }
 }
